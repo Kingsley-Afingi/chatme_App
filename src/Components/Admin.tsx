@@ -1,98 +1,75 @@
+
 import { useState } from "react";
 import ChatBubble from "./ChatBubble";
-// import ChatBubble from "./ChatBubble";
-
-interface Message {
-  id: number;
-  sender: "A" | "B";
-  text: string;
-}
+import type { Message } from "../App";
 
 interface Props {
   messages: Message[];
-  addMessage: (msg: Message) => void;
+  addMessage: (msg: Omit<Message, "timestamp">) => void;
 }
 
 const Admin = ({ messages, addMessage }: Props) => {
-  const [inputA, setInputA] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [input, setInput] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
-  const sendMessage = () => {
-    if (!inputA.trim()) return;
-    const newMsg: Message = {
-      id: Date.now(),
-      sender: "A",
-      text: inputA,
-    };
-    addMessage(newMsg);
-    setInputA("");
-  };
-
-  const handleLogin = () => {
-    if (password === "kingsley") {
-      setIsAuthenticated(true);
-      setError("");
-    } else {
-      setError("Incorrect password. Try again.");
+  const handleSend = () => {
+    if (input.trim()) {
+      addMessage({ sender: "A", text: input });
+      setInput("");
     }
   };
 
+  const login = () => {
+    if (password === "kingsley") {
+      setAuthenticated(true);
+    } else {
+      alert("Wrong password!");
+    }
+  };
+
+  if (!authenticated) {
+    return (
+      <div className="p-6 flex items-center justify-center flex-col space-y-2">
+        <h2 className="text-lg font-bold">THIS IS FOR ADMIN ONLY</h2>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter admin password"
+          className="border px-2 py-1"
+        />
+        <button onClick={login} className="bg-blue-600 text-white px-4 py-1 ml-2 rounded">
+          Login
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 p-4 overflow-y-auto">
-      <h2 className="text-center text-blue-600 text-2xl font-bold mb-4">
-        Admin Chat
-      </h2>
+    <div className="p-4 ">
+      <h2 className="text-xl  font-bold text-blue-600">Admin Chat</h2>
+      <div className="bg-white shadow rounded p-3 max-w-xl w-[800px] mx-auto h-[250px] overflow-y-scroll my-4">
+        {messages.map((msg) => (
+          <ChatBubble key={msg.id} message={msg} />
+        ))}
+      </div>
 
-      {!isAuthenticated ? (
-        <div className="max-w-sm mx-auto bg-white p-4 rounded shadow">
-          <h3 className="text-lg mb-2">Admin Login</h3>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter admin password"
-            className="w-full px-3 py-2 border rounded mb-2"
-          />
-          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-          <button
-            onClick={handleLogin}
-            className="bg-blue-500 text-white w-full py-2 rounded"
-          >
-            Login
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="max-w-xl mx-auto space-y-2 bg-white p-4 rounded shadow h-[200px] overflow-y-scroll">
-            {messages.map((msg) => (
-              <ChatBubble key={msg.id} message={msg} />
-            ))}
-          </div>
-
-          <div className="max-w-xl mx-auto mt-6">
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={inputA}
-                onChange={(e) => setInputA(e.target.value)}
-                placeholder="Admin (User A)"
-                className="flex-1 px-3 py-2 rounded border"
-              />
-              <button
-                onClick={sendMessage}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Send
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      <div className="max-w-xl mx-auto flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          className="border px-2 py-1 flex-1 rounded"
+          placeholder="Message from Admin"
+        />
+        <button onClick={handleSend} className="bg-blue-600 text-white px-4 rounded">
+          Send
+        </button>
+      </div>
     </div>
   );
 };
 
 export default Admin;
+
 

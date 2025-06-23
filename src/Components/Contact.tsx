@@ -1,63 +1,46 @@
+
 import { useState } from "react";
 import ChatBubble from "./ChatBubble";
-// import ChatBubble from "./ChatBubble";
-
-interface Message {
-  id: number;
-  sender: "A" | "B";
-  text: string;
-}
+import type { Message } from "../App";
 
 interface Props {
   messages: Message[];
-  addMessage: (msg: Message) => void;
+  addMessage: (msg: Omit<Message, "timestamp">) => void;
 }
 
 const Contact = ({ messages, addMessage }: Props) => {
-  const [inputB, setInputB] = useState("");
+  const [input, setInput] = useState("");
 
-  const sendMessage = () => {
-    if (!inputB.trim()) return;
-    const newMsg: Message = {
-      id: Date.now(),
-      sender: "B",
-      text: inputB,
-    };
-    addMessage(newMsg);
-    setInputB("");
+  const handleSend = () => {
+    if (input.trim()) {
+      addMessage({ sender: "B", text: input });
+      setInput("");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <h2 className="text-center text-green-600 text-2xl font-bold mb-4">
-        Contact Chat
-      </h2>
-
-      <div className="max-w-xl mx-auto space-y-2 bg-white p-4 rounded shadow h-[400px] overflow-y-scroll">
+    <div className="p-4">
+      <h2 className="text-xl font-bold text-green-600">Contact Chat</h2>
+      <div className="bg-white shadow rounded p-3 max-w-xl mx-auto h-[250px] overflow-y-scroll my-4">
         {messages.map((msg) => (
           <ChatBubble key={msg.id} message={msg} />
         ))}
       </div>
 
-      <div className="max-w-xl mx-auto mt-6">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={inputB}
-            onChange={(e) => setInputB(e.target.value)}
-            placeholder="Contact (User B)"
-            className="flex-1 px-3 py-2 rounded border"
-          />
-          <button
-            onClick={sendMessage}
-            className="bg-green-500 text-white px-4 py-2 rounded"
-          >
-            Send
-          </button>
-        </div>
+      <div className="max-w-xl mx-auto flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          className="border px-2 py-1 flex-1 rounded"
+          placeholder="Message from Contact"
+        />
+        <button onClick={handleSend} className="bg-green-600 text-white px-4 rounded">
+          Send
+        </button>
       </div>
     </div>
   );
 };
 
 export default Contact;
+
