@@ -1,5 +1,6 @@
 
-import type { Message } from "../App";
+
+import type { Message } from "./Admin";
 
 
 const ChatBubble = ({ message }: { message: Message }) => {
